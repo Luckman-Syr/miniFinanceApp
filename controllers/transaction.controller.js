@@ -114,7 +114,42 @@ const create = async (req, res) => {
     });
 }
 
+const get = async (req, res) => {
+    // get user from token
+    const user = req.user;
+
+    // find the rekening
+    const rekening = await Rekening.findOne({
+        where: {
+            user_id: user.id
+        }
+    });
+
+    // if rekening not found, return error message
+    if (!rekening) {
+        return res.status(400).json({
+            status: 'error',
+            message: 'Rekening not found'
+        });
+    }
+
+    // find the transaction
+    const transaction = await Transaction.findAll({
+        where: {
+            rekening_id: rekening.id
+        }
+    });
+
+    // return the transaction
+    return res.status(200).json({
+        status: 'success',
+        data: transaction
+    });
+}
+
+
 
 module.exports = {
-    create
+    create,
+    get
 }
